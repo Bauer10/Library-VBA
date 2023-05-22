@@ -1,0 +1,39 @@
+Sub Sentiment_analysis()
+    Dim oRng As Range
+    Dim T1 As Variant
+    Dim i As Long
+    Dim sentScore As Long
+    
+    Set oRng = ActiveSheet.Range("A2", ActiveSheet.Cells(Rows.Count, "A").End(xlUp))
+    
+    T1 = Array("good", "very good", "best", "ace", "brilliant", "lovely", "great", "awesome", "helpful")
+    For i = 0 To UBound(T1)
+        With oRng
+            Set c = .Find(T1(i), LookIn:=xlValues, LookAt:=xlPart, MatchCase:=False)
+            If Not c Is Nothing Then
+                firstAddress = c.Address
+                Do
+                    sentScore = sentScore + 1
+                    Set c = .FindNext(c)
+                Loop While Not c Is Nothing And c.Address <> firstAddress
+            End If
+        End With
+    Next i
+    
+    T1 = Array("bad", "very bad", "worst", "poor", "rubbish", "substandard", "unhelpful", "rude", "arrogant", "ignored")
+    For i = 0 To UBound(T1)
+        With oRng
+            Set c = .Find(T1(i), LookIn:=xlValues, LookAt:=xlPart, MatchCase:=False)
+            If Not c Is Nothing Then
+                firstAddress = c.Address
+                Do
+                    sentScore = sentScore - 1
+                    Set c = .FindNext(c)
+                Loop While Not c Is Nothing And c.Address <> firstAddress
+            End If
+        End With
+    Next i
+    
+    MsgBox "The Sentiment score is " & sentScore
+End Sub
+
