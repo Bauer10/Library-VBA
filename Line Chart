@@ -1,0 +1,42 @@
+Sub SPCChart()
+    ' Create a new chart
+    Dim chart As chart
+    Set chart = Sheets("Chart").Shapes.AddChart2(XlChartType:=xlLine, _
+        Left:=100, Top:=100, Width:=1200, Height:=400).chart
+
+    ' Add the data from Chart
+    With chart
+        .SetSourceData Source:=Sheets("Chart").Range("A2:B50")
+        .ChartType = xlLine
+        .SeriesCollection.NewSeries
+        With .SeriesCollection.NewSeries
+            .Name = "Target"
+            .Values = Sheets("Chart").Range("B2")
+        End With
+        With .SeriesCollection.NewSeries
+            .Name = "Upper Control"
+            .Values = Sheets("Chart").Range("B51")
+        End With
+        With .SeriesCollection.NewSeries
+            .Name = "Lower Control"
+            .Values = Sheets("Chart").Range("B52")
+        End With
+    End With
+
+    ' Clean up
+    With chart.Axes(xlCategory)
+        .HasMajorGridlines = False
+        .HasMinorGridlines = False
+    End With
+    With chart.Axes(xlValue)
+        .HasMajorGridlines = False
+        .HasMinorGridlines = False
+        .CrossesAt = xlMidpoint
+        .TickLabels.NumberFormat = "0.00" ' Customize the number format as desired
+    End With
+
+    ' Remove legend
+    chart.HasLegend = False
+End Sub
+
+
