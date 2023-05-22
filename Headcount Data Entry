@@ -1,0 +1,30 @@
+Sub CollectHeadcountData()
+
+    'Declare variables
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim rng As Range
+    Dim day As String
+    Dim timeOfDay As String
+    Dim headcount As Integer
+    Dim newRow As Long
+    
+    'Set variables
+    Set wb = ThisWorkbook
+    Set ws = wb.Sheets("Headcount Data")
+    
+    'Collect data
+    'Date
+    newRow = ws.Range("A" & ws.Rows.Count).End(xlUp).Row + 1 ' Find the next available row
+    day = InputBox("Enter the day: ")
+    timeOfDay = InputBox("Enter the time of day: ")
+    'Convert the date to the DD/MM/YYYY format
+    dateString = Format(day, "DD/MM/YYYY")
+    'Headcount
+    headcount = InputBox("Enter the headcount: ")
+    'Add a new row to the sheet
+    ws.Range("A" & newRow) = dateString
+    ws.Range("B" & newRow) = timeOfDay
+    ws.Range("C" & newRow) = headcount
+    
+End Sub
