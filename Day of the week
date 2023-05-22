@@ -1,0 +1,82 @@
+Sub CreateBusiestDayChart()
+    'Declare variables
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Dim cell As Range
+    Dim rng As Range
+    Dim dates As Range
+    Dim xValues As Range
+    Dim yValues As Range
+    Dim seriesName As String
+    Dim chart As chart
+
+    'Set variables
+    Set wb = ThisWorkbook
+    Set ws = wb.Sheets("Headcount Data")
+
+    'Find the last row of the dates in column A
+    Set dates = ws.Range("A2", ws.Range("A" & ws.Rows.Count).End(xlUp))
+
+    'Convert the date into the day of the week
+    Set xValues = ws.Range("A2", ws.Range("A" & ws.Rows.Count).End(xlUp))
+    ws.Columns("B:B").Insert Shift:=xlToRight ' Insert a column to accommodate day values
+    ws.Range("B1").Value = "Day" ' Set the header for the new column
+    For Each cell In dates
+        If Not IsEmpty(cell) Then
+            cell.Offset(0, 1).Value = Application.WorksheetFunction.Text(cell.Value, "ddd")
+        End If
+    Next cell
+
+    'Add a new label to the chart for each unique day in the data
+    Set yValues = ws.Range("C2", ws.Range("C" & ws.Rows.Count).End(xlUp))
+
+    For Each cell In xValues
+        If IsNumeric(cell) Then
+            If cell.Value <> yValues(cell.Row, 1) Then
+                seriesName = cell.Offset(0, -2).Value
+                xValues.Add
+                yValues.Add seriesName, 1
+            End If
+        End If
+    Next cell
+
+    'Create a new chart
+    Set chart = ws.Shapes.AddChart(xlColumnClustered).chart
+
+    'Format the chart
+    With chart.Axes(xlCategory)
+        .HasTitle = True
+        .AxisTitle.Characters.Text = "Day of the Week"
+        .AxisTitle.Font.Bold = True
+        .AxisTitle.Font.Size = 12
+        .MajorTickMark = xlTickMarkOutside
+        .MinorTickMark = xlTickMarkInside
+        .TickLabelPosition = xlTickLabelPositionLow
+        .TickLabels.Orientation = 90
+        .TickLabels.NumberFormat = "ddd" ' Display day abbreviations
+    End With
+
+    With chart.Axes(xlValue)
+        .HasTitle = True
+        .AxisTitle.Characters.Text = "Number of Occurrences"
+        .AxisTitle.Font.Bold = True
+        .AxisTitle.Font.Size = 12
+    End With
+
+    With chart.Legend
+        .Delete
+    End With
+
+    With chart
+        .HasTitle = True
+        .ChartTitle.Text = "Busiest Day of the Week"
+        .ChartTitle.Font.Bold = True
+        .ChartTitle.Font.Size = 14
+        .SetSourceData Source:=ws.Range("C1", ws.Cells(ws.Cells(ws.Rows.Count, 3).End(xlUp).Row, 3)), PlotBy:=xlColumns
+    End With
+
+    'Delete the extra column for day values
+    ws.Columns("B:B").Delete
+
+End Sub
+
