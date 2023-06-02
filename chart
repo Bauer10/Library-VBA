@@ -1,0 +1,60 @@
+Sub CreateLineChart()
+    Dim ws As Worksheet
+    Dim chartWs As Worksheet
+    Dim chartObj As ChartObject
+    Dim chartRange As Range
+    Dim lastRow As Long
+    Dim location As String
+    
+    ' Set the worksheet where your data resides
+    Set ws = ThisWorkbook.Worksheets("Sheet3") ' Replace "Sheet3" with your actual sheet name
+    
+    ' Set the location name
+    location = "Mary Seacole"
+    
+    With ws
+        ' Determine the last row of data in column A
+        lastRow = .Cells(.Rows.Count, 1).End(xlUp).Row
+        
+        ' Set the range for the chart
+        Set chartRange = .Range("A1:C" & lastRow)
+        
+        ' Apply filter to include only data related to "Mary Seacole"
+        chartRange.AutoFilter Field:=2, Criteria1:=location
+        
+        ' Set the range to visible cells after filtering
+        Set chartRange = chartRange.SpecialCells(xlCellTypeVisible)
+    End With
+    
+    ' Create a new worksheet for the chart
+    Set chartWs = ThisWorkbook.Worksheets.Add
+    chartWs.Name = "MS" ' Name the new sheet as "MS"
+    
+    ' Create the chart object
+    Set chartObj = chartWs.ChartObjects.Add(Left:=10, Width:=500, Top:=10, Height:=300)
+    
+    ' Set the chart data source to the filtered range
+    chartObj.Chart.SetSourceData chartRange
+    
+    ' Set the chart type to line chart
+    chartObj.Chart.ChartType = xlLine
+    
+    ' Format the chart as needed
+    With chartObj.Chart
+        .HasTitle = True
+        .ChartTitle.Text = "Footfall"
+        
+        ' Add data labels to each series in the chart
+        Dim ser As series
+        For Each ser In .SeriesCollection
+            ser.HasDataLabels = True
+        Next ser
+    End With
+    
+    ' Clear the filter in the original data worksheet
+    ws.AutoFilterMode = False
+    
+    ' Activate the original data worksheet
+    ws.Activate
+End Sub
+
