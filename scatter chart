@@ -1,0 +1,33 @@
+Sub AddCharts()
+
+    Dim lastRow As Long
+    lastRow = Cells(Rows.Count, "A").End(xlUp).Row
+
+    Dim sourceRange As Range
+    Set sourceRange = Range("A2:C" & lastRow)
+
+    With Worksheets("Sheet3").Shapes.AddChart.chart
+
+        'remove existing series, if any
+        While .SeriesCollection.Count > 0
+            .SeriesCollection(1).Delete
+        Wend
+
+        'set properties for chart
+        .ChartType = xlXYScatter
+        .HasLegend = False
+
+        'add each series to chart
+        Dim j As Long
+        For j = 2 To 3
+            With .SeriesCollection.NewSeries
+                .XValues = Range("A2:A" & lastRow)
+                .Values = Range("C2:C" & lastRow)
+                .Name = "=CVData!$B$1" ' Sets the location from B1 as the series name
+            End With
+        Next j
+
+    End With
+
+End Sub
+
